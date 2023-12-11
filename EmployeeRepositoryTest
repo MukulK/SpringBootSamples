@@ -1,0 +1,54 @@
+import com.mukul.cloud.entity.Employee;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@DataJpaTest
+public class EmployeeRepositoryTest {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Test
+    public void testSaveAndFindById() {
+        // Given
+        Employee employee = new Employee();
+        employee.setName("John Doe");
+        employee.setDepartment("IT");
+
+        // When
+        Employee savedEmployee = employeeRepository.save(employee);
+
+        // Then
+        Optional<Employee> foundEmployee = employeeRepository.findById(savedEmployee.getId());
+        assertTrue(foundEmployee.isPresent());
+        assertEquals("John Doe", foundEmployee.get().getName());
+        assertEquals("IT", foundEmployee.get().getDepartment());
+    }
+
+    @Test
+    public void testFindByDepartment() {
+        // Given
+        Employee employee1 = new Employee("Alice", "HR");
+        Employee employee2 = new Employee("Bob", "IT");
+
+        employeeRepository.save(employee1);
+        employeeRepository.save(employee2);
+
+        // When
+        List<Employee> itEmployees = employeeRepository.findByDepartment("IT");
+
+        // Then
+        assertEquals(1, itEmployees.size());
+        assertEquals("Bob", itEmployees.get(0).getName());
+    }
+
+    // Add more tests as needed for other repository methods
+
+}
